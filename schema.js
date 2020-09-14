@@ -1,3 +1,4 @@
+const { default: Axios } = require('axios');
 const {
   GraphQLObjectType,
   GraphQLString,
@@ -5,7 +6,7 @@ const {
   GraphQLSchema,
   GraphQLList,
   GraphQLNonNull,
-} = require('graphql'); 
+} = require('graphql');
 
 const CustomerType = new GraphQLObjectType({
   name: 'Customer',
@@ -19,11 +20,30 @@ const CustomerType = new GraphQLObjectType({
 
 const RootQuery = new GraphQLObjectType({
   name: 'RootQueryType',
-  customer: {
-    type: CustomerType,
+  fields: {
+    customer: {
+      type: CustomerType,
+      args: {
+        id: { type: GraphQLString },
+      },
+      async resolve(parent, args) {
+        const res = await Axios.get(
+          `http://localhost:3000/customers/${args.id}`
+        );
+        const data = await res.data;
+        return data;
+      },
+    },
+    customers: {
+      type: GraphQLList(CustomerType),
+      async resolve(parent, args) {
+        const customers = await Axios.get(`http://localhost:3000/customers`);
+        return customers.data;
+      },
+    },
   },
 });
 
 module.exports = new GraphQLSchema({
-    uery:RootQuery
+  query: RootQuery,
 });
