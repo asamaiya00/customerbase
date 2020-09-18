@@ -7,13 +7,14 @@ const {
   GraphQLList,
   GraphQLNonNull,
 } = require('graphql');
-
+ 
 const CustomerType = new GraphQLObjectType({
   name: 'Customer',
   fields: () => ({
     id: { type: GraphQLString },
     name: { type: GraphQLString },
     email: { type: GraphQLString },
+    imageUrl: { type: GraphQLString },
     age: { type: GraphQLInt },
   }),
 });
@@ -53,12 +54,14 @@ const mutation = new GraphQLObjectType({
         name: { type: new GraphQLNonNull(GraphQLString) },
         email: { type: new GraphQLNonNull(GraphQLString) },
         age: { type: new GraphQLNonNull(GraphQLInt) },
+        imageUrl: { type: new GraphQLNonNull(GraphQLString) },
       },
       resolve(parent, args) {
         return Axios.post('http://localhost:3000/customers', {
           name: args.name,
           email: args.email,
           age: args.age,
+          imageUrl: args.imageUrl,
         }).then((res) => res.data);
       },
     },
@@ -67,6 +70,7 @@ const mutation = new GraphQLObjectType({
       args: {
         id: { type: new GraphQLNonNull(GraphQLString) },
         name: { type: GraphQLString },
+        imageUrl: { type: GraphQLString },
         email: { type: GraphQLString },
         age: { type: GraphQLInt },
       },
